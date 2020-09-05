@@ -5,7 +5,7 @@
 	should be shown if one or more characters entered in the search input field
 	should clear input field value on click, touch or ‘enter’ press
 	should set focus on the input field after clearing input field value if the
-input field was not in focus when the reset button has been pressed
+	input field was not in focus when the reset button has been pressed
 ## Results drop down
 	should be shown if one or more characters entered in the search input field
 	should contain a list of phrases that include the search query string.
