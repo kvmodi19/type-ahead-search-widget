@@ -1,0 +1,209 @@
+<html>
+
+<head>
+    <title>
+        Search App
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .main-container {
+            width: 300px;
+        }
+
+        /* Style the input container */
+        .input-container {
+            display: flex;
+            align-items: center;
+            width: 300px;
+        }
+
+        /* Style the form icons */
+        .icon {
+            position: absolute;
+            left: 15px;
+        }
+
+        /* Style the input fields */
+        .input-field {
+            width: 100%;
+            padding: 20px 30px;
+            outline: none;
+        }
+
+        .icon-close {
+            position: relative;
+            left: auto;
+            right: 25px;
+            cursor: pointer;
+        }
+
+        .search-result {
+            width: 287px;
+            border: 1px solid;
+            overflow: auto;
+        }
+
+        .add-overflow {
+            max-height: 200px;
+        }
+
+        .search-item {
+            cursor: pointer;
+            line-height: 30px;
+            padding: 0 10px;
+        }
+
+        .search-item:active,
+        .search-item:focus,
+        .search-item:hover {
+            background-color: #03A9F4;
+        }
+    </style>
+    <script>
+        var availableTags = [
+            "ActionScript",
+            "AppleScript",
+            "Asp",
+            "BASIC",
+            "C",
+            "C++",
+            "Clojure",
+            "COBOL",
+            "ColdFusion",
+            "Erlang",
+            "Fortran",
+            "Groovy",
+            "Haskell",
+            "Java",
+            "JavaScript",
+            "Lisp",
+            "Perl",
+            "PHP",
+            "Python",
+            "Ruby",
+            "Scala",
+            "Scheme"
+        ];
+        var displayTags = Object.assign([], availableTags);
+
+        function clearData() {
+            var inputElem = document.getElementById('search-input');
+            inputElem.value = "";
+            inputElem.focus();
+            var resultElem = document.querySelector('#search-result');
+            if (resultElem) {
+                resultElem.remove();
+                displayTags = [];
+            }
+        }
+
+        function clearText(event) {
+            if (event.type === 'click' || (event.type === 'keyup' && event.keyCode === 13)) {
+                event.target.style.display = 'none';
+                clearData();
+            }
+        }
+
+        function searchData(event) {
+            var inputText = event.target.value;
+            var textLength = inputText.length;
+            var btn = document.getElementById('close-btn');
+            btn.style.display = textLength ? 'block' : 'none';
+            var resultElem = document.querySelector('#search-result');
+            if (resultElem) {
+                resultElem.remove();
+            }
+            if (textLength) {
+                var regex = new RegExp(inputText, 'i');
+                displayTags = availableTags.filter(function (value) { return value.match(regex) });
+                if (displayTags.length) {
+                    var div = document.createElement('div');
+                    div.id = "search-result";
+                    div.classList.add('search-result');
+                    if (displayTags.length > 5) {
+                        div.classList.add('add-overflow');
+                    }
+                    displayTags.forEach(function (text, index) {
+                        var child = document.createElement('div');
+                        var startIndex = text.match(regex).index;
+                        var str1 = text.substr(0, startIndex);
+                        var str2 = text.substr(startIndex, textLength);
+                        var str3 = text.substr(startIndex + textLength, text.length);
+                        var innerHtml = `<span>${str1}<b>${str2}</b>${str3}</span>`;
+                        child.innerHTML = (innerHtml);
+                        child.tabIndex = "0";
+                        child.id = index;
+                        child.classList.add('search-item');
+                        div.appendChild(child);
+                    });
+                    // Get the reference node
+                    var referenceNode = document.querySelector('#input-container');
+
+                    // Insert the new node before the reference node
+                    referenceNode.after(div);
+                }
+            } else {
+                displayTags = [];
+            }
+        }
+
+        document.onload = function () {
+            document.addEventListener('click', function (event) {
+                var mainContainer = document.querySelector('#main-container');
+                var resultElem = document.querySelector('#search-result');
+                if (resultElem && !mainContainer.contains(event.target)) {
+                    resultElem.style.display = 'none';
+                }
+            });
+            document.addEventListener('keydown', function (event) {
+                console.log(event.keyCode)
+                if ([38, 40].includes(event.keyCode)) {
+                    var resultElem = document.querySelector('#search-result');
+                    if (resultElem && resultElem.contains(event.target)) {
+                        if (event.keyCode === 40 && event.target.nextElementSibling) {
+                            event.target.nextElementSibling.focus()
+                        }
+
+                        if (event.keyCode === 38 && event.target.previousElementSibling) {
+                            event.target.previousElementSibling.focus()
+                        }
+                    }
+                }
+                if (event.keyCode === 27) {
+                    var inputElem = document.getElementById('search-input');
+                    if (event.target.id === 'search-input') {
+                        clearData();
+                    } else if (event.target.id === 'close-btn') {
+                        inputElem.focus();
+                        event.target.blur();
+                    } else {
+                        var resultElem = document.querySelector('#search-result');
+                        if (resultElem && resultElem.contains(event.target)) {
+                            inputElem.focus();
+                            event.target.blur();
+                        }
+                    }
+                }
+            });
+        }();
+
+    </script>
+</head>
+
+<body>
+    <div id="main-container" class="main-container">
+        <div class="input-container" id="input-container">
+            <i class="fa fa-search icon"></i>
+            <input class="input-field" type="text" placeholder="Search" name="search" id="search-input"
+                onkeyup="searchData(event)" onfocus="searchData(event)">
+            <i class="fa fa-close icon-close" id="close-btn" style="display: none" onkeyup="clearText(event)"
+                onclick="clearText(event)" tabindex="0"></i>
+        </div>
+    </div>
+</body>
+
+</html>
